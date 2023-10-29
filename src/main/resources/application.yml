@@ -3,9 +3,9 @@ server:
   servlet:
     context-path: /user
 spring:
-    application:
-        name: user-service
-    data:
-      mongodb:
-        uri: ${mongodb+srv://serverconnection:XeLNDTdl8tFmC2xa@mflix-jho7e.mongodb.net/test?retryWrites=true&w=majority}
-        database: ${database:dev}
+  application:
+    name: user-service
+  data:
+    mongodb:
+      uri: ${mongodb+srv://serverconnection:XeLNDTdl8tFmC2xa@mflix-jho7e.mongodb.net/test?retryWrites=true&w=majority}
+      database: ${database:dev}
