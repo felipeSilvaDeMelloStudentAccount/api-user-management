@@ -11,10 +11,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @Builder
-public class User {
+public class UserProfile {
 
     @Id
     private String id;
-    private String email;
-    private String password;
+    private UserAuthLogin userAuthLogin;
+    private String userName;
+    private String phoneNumber;
 }

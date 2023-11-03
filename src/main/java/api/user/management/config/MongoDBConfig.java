@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class MongoDBConfig {
 
-
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public MongoClient mongoClient(@Value("${spring.data.mongodb.uri}") String connectionString) {
