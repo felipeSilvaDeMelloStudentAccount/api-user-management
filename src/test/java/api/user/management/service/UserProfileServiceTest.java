@@ -35,6 +35,9 @@ class UserProfileServiceTest {
     @Mock
     private PasswordEncoder encoder;
 
+    @Mock
+    private JwtTokenService jwtTokenService;
+
     public static String EMAIL = "testuser@example.com";
 
     public static String PASSWORD = "password123";
@@ -46,6 +49,7 @@ class UserProfileServiceTest {
         UserAuthLogin userAuthLogin = UserAuthLogin.builder().email(EMAIL).password(PASSWORD).build();
         when(userRepository.findByEmail(EMAIL))
                 .thenReturn(Optional.of(UserProfile.builder().userAuthLogin(userAuthLogin).build()));
+        when(jwtTokenService.generateJwtToken(EMAIL)).thenReturn("jwtToken");
 
         UserAuthLogin userLogin = UserAuthLogin.builder().email(EMAIL).password(PASSWORD).build();
 
@@ -55,7 +59,7 @@ class UserProfileServiceTest {
 
         ResponseEntity<String> response = userService.authenticateUser(userLogin);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(EMAIL, response.getBody());
+        assertEquals("jwtToken", response.getBody());
 
         // Verify that the encoder.matches method was called
         verify(encoder).matches(anyString(), anyString());
@@ -87,6 +91,7 @@ class UserProfileServiceTest {
         when(encoder.matches(anyString(), anyString())).thenReturn(true);
         when(userRepository.findByEmail(EMAIL))
                 .thenReturn(Optional.of(UserProfile.builder().userAuthLogin(userAuthLogin).build()));
+        when(jwtTokenService.generateJwtToken(EMAIL)).thenReturn("jwtToken");
 
         ResponseEntity<String> response = userService.authenticateUser(userAuthLogin);
 
