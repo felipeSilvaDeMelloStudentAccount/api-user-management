@@ -21,6 +21,7 @@ public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
     private PasswordEncoder encoder;
+    private JwtTokenService jwtTokenService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -30,7 +31,7 @@ public class UserService implements UserDetailsService {
         }
         return new org.springframework.security.core.userdetails.User(
                 user.get().getUserAuthLogin().getEmail(),
-                user.get().getUserAuthLogin().getPassword(), // Assuming the password is already hashed
+                user.get().getUserAuthLogin().getPassword(),
                 Collections.emptyList()
         );
     }
@@ -45,7 +46,7 @@ public class UserService implements UserDetailsService {
         if (!encoder.matches(userLogin.getPassword(), userDetails.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        String jwtToken = generateJwtToken(userLogin.getEmail());
+        String jwtToken = jwtTokenService.generateJwtToken(userLogin.getEmail());
         return ResponseEntity.ok(jwtToken);
     }
 
@@ -66,9 +67,4 @@ public class UserService implements UserDetailsService {
         return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
     }
 
-    private String generateJwtToken(String username) {
-        // TODO - Implement JWT token service in here
-        // You can use libraries like jwt for this purpose
-        return username;
-    }
 }

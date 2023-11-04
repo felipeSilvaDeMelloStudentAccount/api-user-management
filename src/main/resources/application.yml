@@ -2,6 +2,9 @@ server:
   port: 9001
   servlet:
     context-path: /api
+jwt:
+  secret: ${jwt.secret:secret}
+  expiration: ${jwt.expiration:3600000} # 1 hour
 spring:
   application:
     name: user-service
