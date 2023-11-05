@@ -1,7 +1,7 @@
 package api.user.management.service;
 
-import api.user.management.model.UserAuthLogin;
-import api.user.management.model.UserProfile;
+import api.user.management.model.Login;
+import api.user.management.model.collection.User;
 import api.user.management.repository.UserRepository;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-class UserProfileServiceTest {
+class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
@@ -42,16 +42,18 @@ class UserProfileServiceTest {
 
     public static String PASSWORD = "password123";
 
+    public static String USERNAME = "test";
+
 
     @Test
     void testAuthenticateUser() {
         // Define mock behavior for UserRepository
-        UserAuthLogin userAuthLogin = UserAuthLogin.builder().email(EMAIL).password(PASSWORD).build();
+        User user = User.builder().email(EMAIL).password(PASSWORD).userName(USERNAME).build();
         when(userRepository.findByEmail(EMAIL))
-                .thenReturn(Optional.of(UserProfile.builder().userAuthLogin(userAuthLogin).build()));
+                .thenReturn(Optional.of(user));
         when(jwtTokenService.generateJwtToken(EMAIL)).thenReturn("jwtToken");
 
-        UserAuthLogin userLogin = UserAuthLogin.builder().email(EMAIL).password(PASSWORD).build();
+        Login userLogin = Login.builder().email(EMAIL).password(PASSWORD).build();
 
         // Define mock behavior for PasswordEncoder
         when(encoder.matches(anyString(), anyString())).thenReturn(true);
@@ -67,10 +69,10 @@ class UserProfileServiceTest {
 
     @Test
     void testLoadUserByUsername() {
-        UserAuthLogin userAuthLogin = UserAuthLogin.builder().email("testuser@example.com")
-                .password("password123").build();
+        User user = User.builder().email("testuser@example.com")
+                .password("password123").userName(USERNAME).build();
         when(userRepository.findByEmail("testuser@example.com"))
-                .thenReturn(Optional.of(UserProfile.builder().userAuthLogin(userAuthLogin).build()));
+                .thenReturn(Optional.of(user));
         UserDetails userDetails = userService.loadUserByUsername("testuser@example.com");
         assertNotNull(userDetails);
         assertEquals("testuser@example.com", userDetails.getUsername());
@@ -87,13 +89,14 @@ class UserProfileServiceTest {
 
     @Test
     void testAuthenticateUserSuccess() {
-        UserAuthLogin userAuthLogin = UserAuthLogin.builder().email(EMAIL).password(PASSWORD).build();
+        User user = User.builder().email(EMAIL).password(PASSWORD).userName(USERNAME).build();
         when(encoder.matches(anyString(), anyString())).thenReturn(true);
         when(userRepository.findByEmail(EMAIL))
-                .thenReturn(Optional.of(UserProfile.builder().userAuthLogin(userAuthLogin).build()));
+                .thenReturn(Optional.of(user));
         when(jwtTokenService.generateJwtToken(EMAIL)).thenReturn("jwtToken");
 
-        ResponseEntity<String> response = userService.authenticateUser(userAuthLogin);
+        Login login = Login.builder().email(EMAIL).password(PASSWORD).build();
+        ResponseEntity<String> response = userService.authenticateUser(login);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -101,9 +104,10 @@ class UserProfileServiceTest {
 
     @Test
     void testAuthenticateUserUserNotFound() {
-        UserAuthLogin userLogin = new UserAuthLogin("nonexistent@example.com", "password123");
+
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
-        ResponseEntity<String> response = userService.authenticateUser(userLogin);
+        Login login = Login.builder().email("nonexistent@example.com").password("password123").build();
+        ResponseEntity<String> response = userService.authenticateUser(login);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Email nonexistent@example.com not found", response.getBody());
@@ -111,16 +115,16 @@ class UserProfileServiceTest {
 
     @Test
     void testAuthenticateUserIncorrectPassword() {
-        UserAuthLogin userAuthLogin = UserAuthLogin.builder().email(EMAIL).password(PASSWORD).build();
+        User user = User.builder().email(EMAIL).password(PASSWORD).userName(USERNAME).build();
         when(userRepository.findByEmail(EMAIL))
-                .thenReturn(Optional.of(UserProfile.builder().userAuthLogin(userAuthLogin).build()));
+                .thenReturn(Optional.of(user));
         // Define mock behavior for PasswordEncoder
         when(encoder.matches(anyString(), anyString())).thenReturn(false);
 
-        UserAuthLogin userLogin = new UserAuthLogin("testuser@example.com", "wrongPassword");
-        ResponseEntity<String> response = userService.authenticateUser(userLogin);
+        Login login = Login.builder().email("testuser@example.com").password("wrongPassword").build();
+        ResponseEntity<String> response = userService.authenticateUser(login);
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertNull(response.getBody());
+        assertEquals("Incorrect Password", response.getBody());
     }
 }

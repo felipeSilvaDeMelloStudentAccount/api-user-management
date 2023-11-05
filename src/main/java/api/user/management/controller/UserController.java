@@ -1,6 +1,7 @@
 package api.user.management.controller;
 
-import api.user.management.model.UserAuthLogin;
+import api.user.management.model.Login;
+import api.user.management.model.Registration;
 import api.user.management.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +19,15 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<String> login(@RequestBody UserAuthLogin userLogin) {
+    public ResponseEntity<String> login(@RequestBody Login userLogin) {
         log.info("login controller");
         return userService.authenticateUser(userLogin);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserAuthLogin userAuthLogin) {
+    public ResponseEntity<String> register(@RequestBody Registration registration) {
         log.info("register controller");
-        return userService.registerUser(userAuthLogin);
+        return userService.registerUser(registration);
     }
 }
 
