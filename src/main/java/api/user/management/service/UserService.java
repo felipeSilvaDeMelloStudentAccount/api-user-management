@@ -51,27 +51,25 @@ public class UserService implements UserDetailsService {
     }
 
     public ResponseEntity<Map<String, String>> authenticateUser(Login userLogin) {
-        UserDetails userDetails;
         Map<String, String> response = new HashMap<>();
-
-        try {
-            userDetails = loadUserByUsername(userLogin.getEmail());
-        } catch (UsernameNotFoundException e) {
-            log.debug("Email {} not found", userLogin.getEmail());
-            response.put("message", e.getMessage());
+        String email = userLogin.getEmail();
+        String password = userLogin.getPassword();
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            log.debug("Email {} not found", email);
+            response.put("message", "Email " + email + " not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-
-        if (!encoder.matches(userLogin.getPassword(), userDetails.getPassword())) {
-            log.debug("Invalid password for email {}", userLogin.getEmail());
+        if (!encoder.matches(password, user.get().getPassword())) {
+            log.debug("Invalid password for email {}", email);
             response.put("message", "Incorrect Password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-
-        String jwtToken = jwtTokenService.generateJwtToken(userDetails.getUsername());
-        log.debug("JWT token generated for email {} is {}", userLogin.getEmail(), jwtToken);
+        String jwtToken = jwtTokenService.generateJwtToken(user.get());
+        log.debug("JWT token generated for email {} is {}", email, jwtToken);
         response.put("jwtToken", jwtToken);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+
     }
 
     @Transactional
@@ -154,8 +152,17 @@ public class UserService implements UserDetailsService {
                     response.setHttpStatus(HttpStatus.UNAUTHORIZED);
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
                 } else {
+
                     // Encode password
                     String encodedPassword = encoder.encode(passwordUpdate.getNewPassword());
+                    //Check if encoded password is strong
+                    if (encodedPassword.length() < 8) {
+                        log.debug("Password is not strong");
+                        response.setMessage("Password is not strong");
+                        response.setHttpStatus(HttpStatus.UNAUTHORIZED);
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                    }
+
                     // Create a new User
                     optionalUser.get().setPassword(encodedPassword);
                     userRepository.save(optionalUser.get());
