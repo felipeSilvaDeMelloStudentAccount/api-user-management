@@ -4,6 +4,7 @@ import api.user.management.model.Login;
 import api.user.management.model.PasswordUpdate;
 import api.user.management.model.Registration;
 import api.user.management.model.RequestResponse;
+import api.user.management.service.JwtTokenService;
 import api.user.management.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,19 @@ import java.util.Map;
 @CrossOrigin(origins = "localhost:3000")
 public class UserController {
     private UserService userService;
-
+    private JwtTokenService jwtTokenService;
 
     @GetMapping("/{userid}")
-    public ResponseEntity<RequestResponse> getUsers(@PathVariable String userid) {
+    public ResponseEntity<RequestResponse> getUsers(
+//            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable String userid) {
         log.info("getUsers controller");
+//        try {
+//            jwtTokenService.validateToken(authorizationHeader);
+//        } catch (Exception e) {
+//            log.error("Error while validating token {}", e.getMessage());
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         return userService.getUser(userid);
     }
 
