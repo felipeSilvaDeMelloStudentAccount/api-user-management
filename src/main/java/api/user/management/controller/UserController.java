@@ -1,6 +1,7 @@
 package api.user.management.controller;
 
 import api.user.management.model.Login;
+import api.user.management.model.PasswordUpdate;
 import api.user.management.model.Registration;
 import api.user.management.model.RequestResponse;
 import api.user.management.service.UserService;
@@ -19,10 +20,23 @@ import java.util.Map;
 public class UserController {
     private UserService userService;
 
-    @GetMapping
-    public ResponseEntity<RequestResponse> getUsers(@RequestParam String userid) {
+
+    @GetMapping("/{userid}")
+    public ResponseEntity<RequestResponse> getUsers(@PathVariable String userid) {
         log.info("getUsers controller");
         return userService.getUser(userid);
+    }
+
+    @PatchMapping("/{userid}")
+    public ResponseEntity<RequestResponse> updatePassword(@PathVariable String userid, @RequestBody PasswordUpdate passwordUpdate) {
+        log.info("getUsers controller");
+        return userService.updateUserPassword(userid, passwordUpdate);
+    }
+
+    @DeleteMapping("/{userid}")
+    public ResponseEntity<RequestResponse> deleteUser(@PathVariable String userid) {
+        log.info("deleteUser controller");
+        return userService.deleteUser(userid);
     }
 
     @PostMapping
