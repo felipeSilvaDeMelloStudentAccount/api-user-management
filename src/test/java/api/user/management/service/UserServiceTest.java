@@ -27,7 +27,7 @@
 //class UserServiceTest {
 //
 //    @InjectMocks
-//    private UserService userService;
+//    private UserRegistrationService userService;
 //
 //    @Mock
 //    private UserRepository userRepository;

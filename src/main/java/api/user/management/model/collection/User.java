@@ -1,6 +1,8 @@
 package api.user.management.model.collection;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @Builder
+@JsonDeserialize(builder = User.UserBuilder.class)
+@JsonSerialize(as = User.class)
 public class User {
 
     @Id

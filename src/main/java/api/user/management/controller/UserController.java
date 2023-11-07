@@ -1,17 +1,18 @@
 package api.user.management.controller;
 
+import api.user.management.model.ErrorClass;
 import api.user.management.model.Login;
 import api.user.management.model.PasswordUpdate;
 import api.user.management.model.Registration;
-import api.user.management.model.RequestResponse;
-import api.user.management.service.JwtTokenService;
-import api.user.management.service.UserService;
+import api.user.management.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Slf4j
 @AllArgsConstructor
@@ -19,45 +20,55 @@ import java.util.Map;
 @RequestMapping("/v1/users")
 @CrossOrigin(origins = "localhost:3000")
 public class UserController {
-    private UserService userService;
+
+    private UserRegistrationService userRegistrationService;
+    private UserInformationService userInformationService;
+    private UserAuthenticationService userAuthenticationService;
+    private UserPasswordUpdateService userPasswordUpdateService;
     private JwtTokenService jwtTokenService;
+    private ObjectMapper objectMapper;
 
     @GetMapping("/{userid}")
-    public ResponseEntity<RequestResponse> getUsers(
-//            @RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable String userid) {
+    public ResponseEntity<String> getUsers(@RequestHeader("Authorization") String authorizationHeader, @PathVariable String userid) throws JsonProcessingException {
         log.info("getUsers controller");
-//        try {
-//            jwtTokenService.validateToken(authorizationHeader);
-//        } catch (Exception e) {
-//            log.error("Error while validating token {}", e.getMessage());
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
-        return userService.getUser(userid);
+
+
+        if (!jwtTokenService.validateToken(authorizationHeader)) {
+            log.error("Invalid JwtToken");
+            ErrorClass errorClass = ErrorClass.builder()
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .cause("JwtToken")
+                    .message("Invalid JwtToken")
+                    .build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(objectMapper.writeValueAsString(errorClass));
+        }
+        return userInformationService.getUser(userid);
+
+
     }
 
     @PatchMapping("/{userid}")
-    public ResponseEntity<RequestResponse> updatePassword(@PathVariable String userid, @RequestBody PasswordUpdate passwordUpdate) {
+    public ResponseEntity<String> updatePassword(@PathVariable String userid, @RequestBody PasswordUpdate passwordUpdate) throws JsonProcessingException {
         log.info("getUsers controller");
-        return userService.updateUserPassword(userid, passwordUpdate);
+        return userPasswordUpdateService.updateUserPassword(userid, passwordUpdate);
     }
 
     @DeleteMapping("/{userid}")
-    public ResponseEntity<RequestResponse> deleteUser(@PathVariable String userid) {
+    public ResponseEntity<String> deleteUser(@PathVariable String userid) throws JsonProcessingException {
         log.info("deleteUser controller");
-        return userService.deleteUser(userid);
+        return userInformationService.deleteUser(userid);
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> login(@RequestBody Login userLogin) {
+    public ResponseEntity<String> login(@RequestBody Login userLogin) throws JsonProcessingException {
         log.info("login controller");
-        return userService.authenticateUser(userLogin);
+        return userAuthenticationService.authenticateUser(userLogin);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RequestResponse> register(@RequestBody Registration registration) {
+    public ResponseEntity<String> register(@Validated @RequestBody Registration registration) throws JsonProcessingException {
         log.info("register controller");
-        return userService.registerUser(registration);
+        return userRegistrationService.registerUser(registration);
     }
 }
 

@@ -52,7 +52,7 @@ public class JwtTokenService {
 
     }
 
-    public void validateToken(String authorizationHeader) {
+    public boolean validateToken(String authorizationHeader) {
         log.debug("Validating JWT token");
         log.debug("authorizationHeader : {}", authorizationHeader);
         //Remove Authorization prefix
@@ -62,11 +62,12 @@ public class JwtTokenService {
             JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
             if (claims.getExpirationTime().before(new Date())) {
                 log.debug("JWT token expired");
-                throw new RuntimeException("JWT token expired");
+                return false;
             }
         } catch (Exception e) {
             log.error("Error while validating JWT token error message : {}", e.getMessage());
-            throw new RuntimeException("Error while validating JWT token");
+            return false;
         }
+        return true;
     }
 }
