@@ -1,7 +1,6 @@
 package api.user.management.model;
 
 import lombok.*;
-import org.springframework.http.HttpStatus;
 
 @Setter
 @Getter
@@ -10,5 +9,4 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 public class RequestResponse {
     private String message;
-    private HttpStatus httpStatus;
 }
