@@ -1,6 +1,10 @@
 package api.user.management.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -8,5 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestResponse {
-    private String message;
+
+  private String message;
 }

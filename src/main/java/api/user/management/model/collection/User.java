@@ -1,6 +1,7 @@
 package api.user.management.model.collection;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
@@ -18,9 +19,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @JsonSerialize(as = User.class)
 public class User {
 
-    @Id
-    private ObjectId id;
-    private String email;
-    private String userName;
-    private String password;
+  @Id
+  private ObjectId id;
+  private String email;
+  private String userName;
+  @JsonIgnore
+  private String password;
 }
