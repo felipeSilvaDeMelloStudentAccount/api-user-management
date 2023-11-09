@@ -62,14 +62,19 @@ public class JwtTokenService {
       SignedJWT signedJWT = SignedJWT.parse(jwtToken);
       JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
       //Only allow the user to access their own data
-      if (claims.getSubject().equals(userid) && claims.getExpirationTime().before(new Date())) {
-        log.debug("JWT token not valid for user {}", userid);
+      if (claims.getExpirationTime().before(new Date())) {
+        log.debug("JWT token expired for user {}", userid);
+        return false;
+      }
+      if (claims.getSubject().equals(userid)) {
+        log.debug("JWT token valid for user {}", userid);
         return true;
       }
     } catch (Exception e) {
       log.error("Error while validating JWT token error message : {}", e.getMessage());
-      return true;
+      return false;
     }
+    log.debug("JWT token is invalid for user {}", userid);
     return false;
   }
 }

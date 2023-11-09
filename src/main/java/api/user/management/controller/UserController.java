@@ -46,7 +46,7 @@ public class UserController {
       @PathVariable String userid) throws JsonProcessingException {
     log.info("getUsers controller");
 
-    if (jwtTokenService.isValidToken(userid, authorizationHeader)) {
+    if (!jwtTokenService.isValidToken(userid, authorizationHeader)) {
       return invalidToken();
     }
     return userInformationService.getUser(userid);
@@ -69,7 +69,7 @@ public class UserController {
       @RequestHeader("Authorization") String authorizationHeader, @PathVariable String userid,
       @RequestBody PasswordUpdate passwordUpdate) throws JsonProcessingException {
     log.info("getUsers controller");
-    if (jwtTokenService.isValidToken(userid, authorizationHeader)) {
+    if (!jwtTokenService.isValidToken(userid, authorizationHeader)) {
       return invalidToken();
     }
     return userPasswordUpdateService.updateUserPassword(userid, passwordUpdate);
@@ -79,7 +79,7 @@ public class UserController {
   public ResponseEntity<String> deleteUser(
       @RequestHeader("Authorization") String authorizationHeader, @PathVariable String userid)
       throws JsonProcessingException {
-    if (jwtTokenService.isValidToken(userid, authorizationHeader)) {
+    if (!jwtTokenService.isValidToken(userid, authorizationHeader)) {
       return invalidToken();
     }
     log.info("deleteUser controller");

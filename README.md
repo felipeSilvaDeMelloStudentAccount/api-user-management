@@ -28,7 +28,7 @@ Register a user by providing the necessary details.
 ```json
 {
   "email": "user@example.com",
-  "username": "exampleUser",
+  "userName": "exampleUser",
   "password": "examplePassword"
 }
 ```
