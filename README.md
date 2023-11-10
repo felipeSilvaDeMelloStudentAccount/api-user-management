@@ -20,16 +20,24 @@ Register a user by providing the necessary details.
 
 #### Request Body
 
-- **Email**: The user's email address.
-- **Username**: The user's username.
-- **Password**: The user's password.
+- **email**: The user's email address.
+- **userName**: The user's username.
+- **password**: The user's password.
+- **confirmPassword**: The user's password confirmation.
+
+- #### Password Policy
+- At least 8 chars
+- Contains at least one digit
+- Contains at least one lower alpha char and one upper alpha char
+- Contains at least one char within a set of special chars (@#%$^ etc.)
 - #### Example Request Body
 
 ```json
 {
   "email": "user@example.com",
   "userName": "exampleUser",
-  "password": "examplePassword"
+  "password": "examplePassword",
+  "confirmPassword": "exampleconfirmPassword@123"
 }
 ```
 
@@ -71,8 +79,8 @@ Login a user by providing the necessary details.
 
 #### Request Body
 
-- **Email**: The user's email address.
-- **Password**: The user's password.
+- **email**: The user's email address.
+- **password**: The user's password.
 - #### Example Request Body
 
 ```json
@@ -81,6 +89,7 @@ Login a user by providing the necessary details.
   "password": "examplePassword"
 }
 ```
+
 
 #### Example Responses 401, 404, 200
 
@@ -113,19 +122,18 @@ Login a user by providing the necessary details.
 ### Update User Password
 
 Update a user password by providing the necessary details.
-
 - **URL**: `http://localhost:9001/api/v1/users/{userid}`
 - **Method**: `PATCH`
 - **Content Type**: `application/json`
 
 #### Request Header
 
-Authorization : Bearer JWT...
+- **Authorization** : Bearer Token from login
 
 #### Request Body
 
-- **Current Password**: The user's current password.
-- **New Password**: The user's new password.
+- **currentPassword**: The user's current password.
+- **newPassword**: The user's new password.
 - #### Example Request Body
 
 ```json
@@ -138,17 +146,14 @@ Authorization : Bearer JWT...
 ---
 
 ### Get user by ID
-
 Get a user by ID.
-
-#### Request Header
-
-Authorization : Bearer JWT...
-
 - **URL**: `http://localhost:9001/api/v1/users/{userid}`
 - **Method**: `GET`
 - **Content Type**: `application/json`
 
+#### Request Header
+
+- **Authorization** : Bearer Token from login
 ---
 
 ### Delete user by ID

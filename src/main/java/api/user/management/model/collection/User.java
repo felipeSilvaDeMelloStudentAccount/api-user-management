@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class User {
 
   @Id
-  private ObjectId id;
+  private String id;
   private String email;
   private String userName;
   @JsonIgnore

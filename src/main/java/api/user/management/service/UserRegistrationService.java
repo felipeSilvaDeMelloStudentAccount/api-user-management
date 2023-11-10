@@ -1,13 +1,16 @@
 package api.user.management.service;
 
 import static api.user.management.utils.Constants.DATABASE_ERROR;
+import static api.user.management.utils.PasswordPolicyValidator.validatePassword;
 
-import api.user.management.model.ErrorClass;
+import api.user.management.model.Error;
 import api.user.management.model.Registration;
 import api.user.management.model.collection.User;
 import api.user.management.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.lang.Collections;
+import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,14 +40,30 @@ public class UserRegistrationService {
       Optional<User> user = userRepository.findByEmail(registration.getEmail());
       if (user.isPresent()) {
         log.debug("Email {} already exists", registration.getEmail());
-        ErrorClass errorClass = ErrorClass.builder()
-            .status(HttpStatus.BAD_REQUEST)
+        Error error = Error.builder()
             .cause("Email")
             .message("Email already exists")
             .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(objectMapper.writeValueAsString(errorClass));
+            .body(objectMapper.writeValueAsString(error));
       } else {
+
+        if (!registration.getPassword().equals(registration.getConfirmPassword())) {
+          log.debug("Password {}, Confirm Password {}, does not match", registration.getPassword(),
+              registration.getConfirmPassword());
+          Error error = Error.builder()
+              .cause("Password")
+              .message("Passwords not matching")
+              .build();
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+              .body(objectMapper.writeValueAsString(error));
+        }
+        List<Error> passwordErrors = validatePassword(registration.getPassword());
+        if (!Collections.isEmpty(passwordErrors)) {
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+              .body(objectMapper.writeValueAsString(passwordErrors));
+        }
+
         // Encode password
         String encodedPassword = encoder.encode(registration.getPassword());
         // Create a new User
@@ -58,28 +77,23 @@ public class UserRegistrationService {
         //return the body in JSON format
         String response = "{\"message\":\"User registered successfully\"}";
         return ResponseEntity.status(HttpStatus.OK).body(objectMapper.writeValueAsString(response));
-
-
       }
     } catch (DataAccessException e) {
       log.debug("Error while saving user: {}", e.getMessage());
-      ErrorClass errorClass = ErrorClass.builder()
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      Error error = Error.builder()
           .cause(DATABASE_ERROR)
           .message(e.getMessage())
           .build();
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(objectMapper.writeValueAsString(errorClass));
+          .body(objectMapper.writeValueAsString(error));
 
     } catch (Exception e) {
-      ErrorClass errorClass = ErrorClass.builder()
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      Error error = Error.builder()
           .cause("Server error")
           .message(e.getMessage())
           .build();
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(objectMapper.writeValueAsString(errorClass));
-
+          .body(objectMapper.writeValueAsString(error));
     }
   }
 

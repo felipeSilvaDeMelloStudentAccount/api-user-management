@@ -1,6 +1,6 @@
 package api.user.management.service;
 
-import api.user.management.model.ErrorClass;
+import api.user.management.model.Error;
 import api.user.management.model.Login;
 import api.user.management.model.collection.User;
 import api.user.management.repository.UserRepository;
@@ -30,23 +30,21 @@ public class UserAuthenticationService {
     Optional<User> user = userRepository.findByEmail(email);
     if (user.isEmpty()) {
       log.debug("Email {} not found", email);
-      ErrorClass errorClass = ErrorClass.builder()
-          .status(HttpStatus.BAD_REQUEST)
+      Error error = Error.builder()
           .cause("Email not found")
           .message("Email " + email + " not found")
           .build();
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-          .body(objectMapper.writeValueAsString(errorClass));
+          .body(objectMapper.writeValueAsString(error));
     }
     if (!encoder.matches(password, user.get().getPassword())) {
       log.debug("Invalid password for email {}", email);
-      ErrorClass errorClass = ErrorClass.builder()
-          .status(HttpStatus.BAD_REQUEST)
+      Error error = Error.builder()
           .cause("Password")
           .message("Password does not match")
           .build();
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-          .body(objectMapper.writeValueAsString(errorClass));
+          .body(objectMapper.writeValueAsString(error));
     }
     String jwtToken = jwtTokenService.generateJwtToken(user.get());
     log.debug("JWT token generated for email {} is {}", email, jwtToken);
