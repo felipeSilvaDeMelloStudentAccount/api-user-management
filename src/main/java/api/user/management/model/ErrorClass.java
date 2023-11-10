@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 @JsonDeserialize
 public class ErrorClass {
 
-    private HttpStatus status;
-    private String cause;
-    private String message;
+  private HttpStatus status;
+  private String cause;
+  private String message;
 }

@@ -6,7 +6,8 @@ User Management
 
 ## User Registration API
 
-This is the documentation for the User Registration API, which allows users to register with their email and other
+This is the documentation for the User Registration API, which allows users to register with their
+email and other
 information.
 
 ### Register User
@@ -27,7 +28,7 @@ Register a user by providing the necessary details.
 ```json
 {
   "email": "user@example.com",
-  "username": "exampleUser",
+  "userName": "exampleUser",
   "password": "examplePassword"
 }
 ```
@@ -117,6 +118,10 @@ Update a user password by providing the necessary details.
 - **Method**: `PATCH`
 - **Content Type**: `application/json`
 
+#### Request Header
+
+Authorization : Bearer JWT...
+
 #### Request Body
 
 - **Current Password**: The user's current password.
@@ -136,6 +141,10 @@ Update a user password by providing the necessary details.
 
 Get a user by ID.
 
+#### Request Header
+
+Authorization : Bearer JWT...
+
 - **URL**: `http://localhost:9001/api/v1/users/{userid}`
 - **Method**: `GET`
 - **Content Type**: `application/json`
@@ -150,10 +159,14 @@ Delete a user by ID.
 - **Method**: `DELETE`
 - **Content Type**: `application/json`
 
+#### Request Header
+
+Authorization : Bearer JWT...
+
 ## Running the application
 
 ```bash
-spring-boot:run -Dspring-boot.run.arguments=--DBURI=mongodb+srv://<username>:<password>@camp.s1dnkux.mongodb.net/dev,--SECRET=<SECRETKEY>,--EXPIRATION=<TOKEN_EXPIRY> -f pom.xml
+mvn spring-boot:run -Dspring-boot.run.arguments=--DBURI=mongodb+srv://<username>:<password>@camp.s1dnkux.mongodb.net/dev,--SECRET=<SECRETKEY>,--EXPIRATION=<TOKEN_EXPIRY> -f pom.xml
 ```
 
 ---

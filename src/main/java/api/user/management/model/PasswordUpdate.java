@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class PasswordUpdate {
-    private String newPassword;
-    private String currentPassword;
+
+  private String newPassword;
+  private String currentPassword;
 }
