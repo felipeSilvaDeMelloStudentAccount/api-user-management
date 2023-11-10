@@ -1,6 +1,6 @@
 package api.user.management.controller;
 
-import api.user.management.model.ErrorClass;
+import api.user.management.model.Error;
 import api.user.management.model.Login;
 import api.user.management.model.PasswordUpdate;
 import api.user.management.model.Registration;
@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@AllArgsConstructor
 @RestController
-@RequestMapping("/v1/users")
+@AllArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping(path = "/v1/users", produces = "application/json")
 public class UserController {
 
   private UserRegistrationService userRegistrationService;
@@ -45,24 +45,12 @@ public class UserController {
   public ResponseEntity<String> getUsers(@RequestHeader("Authorization") String authorizationHeader,
       @PathVariable String userid) throws JsonProcessingException {
     log.info("getUsers controller");
-
     if (!jwtTokenService.isValidToken(userid, authorizationHeader)) {
       return invalidToken();
     }
     return userInformationService.getUser(userid);
-
-
   }
 
-  private ResponseEntity<String> invalidToken() throws JsonProcessingException {
-    ErrorClass errorClass = ErrorClass.builder()
-        .status(HttpStatus.UNAUTHORIZED)
-        .cause("JwtToken")
-        .message("Invalid JwtToken")
-        .build();
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-        .body(objectMapper.writeValueAsString(errorClass));
-  }
 
   @PatchMapping("/{userid}")
   public ResponseEntity<String> updatePassword(
@@ -97,6 +85,15 @@ public class UserController {
       throws JsonProcessingException {
     log.info("register controller");
     return userRegistrationService.registerUser(registration);
+  }
+
+  private ResponseEntity<String> invalidToken() throws JsonProcessingException {
+    Error error = Error.builder()
+        .cause("JwtToken")
+        .message("Invalid JwtToken")
+        .build();
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(objectMapper.writeValueAsString(error));
   }
 }
 

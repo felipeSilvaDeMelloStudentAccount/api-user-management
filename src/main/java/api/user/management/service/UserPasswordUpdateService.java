@@ -3,15 +3,18 @@ package api.user.management.service;
 import static api.user.management.utils.Constants.DATABASE_ERROR;
 import static api.user.management.utils.Constants.USER_NOT_FOUND;
 import static api.user.management.utils.Constants.USER_NOT_FOUND_MESSAGE;
+import static api.user.management.utils.PasswordPolicyValidator.validatePassword;
 
-import api.user.management.model.ErrorClass;
+import api.user.management.model.Error;
 import api.user.management.model.PasswordUpdate;
 import api.user.management.model.RequestResponse;
 import api.user.management.model.collection.User;
 import api.user.management.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.lang.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -40,40 +43,31 @@ public class UserPasswordUpdateService {
       Optional<User> optionalUser = userRepository.findById(userid);
       if (optionalUser.isEmpty()) {
         log.debug(USER_NOT_FOUND, userid);
-        ErrorClass errorClass = ErrorClass.builder()
-            .status(HttpStatus.NOT_FOUND)
+        Error error = Error.builder()
             .cause("User not found")
             .message(USER_NOT_FOUND_MESSAGE)
             .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(objectMapper.writeValueAsString(errorClass));
+            .body(objectMapper.writeValueAsString(error));
       }
+      List<Error> passwordErrors = validatePassword(passwordUpdate.getNewPassword());
+      if (!Collections.isEmpty(passwordErrors)) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(objectMapper.writeValueAsString(passwordErrors));
+      }
+
       if (!encoder.matches(passwordUpdate.getCurrentPassword(), optionalUser.get().getPassword())) {
         log.debug("Invalid password for userid {}", userid);
         response.setMessage("Incorrect Password");
-        ErrorClass errorClass = ErrorClass.builder()
-            .status(HttpStatus.BAD_REQUEST)
+        Error error = Error.builder()
             .cause("Incorrect Password")
             .message("Current Password does not match old password")
             .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(objectMapper.writeValueAsString(errorClass));
+            .body(objectMapper.writeValueAsString(error));
       } else {
         // Encode password
         String encodedPassword = encoder.encode(passwordUpdate.getNewPassword());
-        //Check if encoded password is strong
-        if (encodedPassword.length() < 8) {
-          log.debug("Password is not strong");
-          response.setMessage("Password is not strong");
-          ErrorClass errorClass = ErrorClass.builder()
-              .status(HttpStatus.BAD_REQUEST)
-              .cause("Password strength")
-              .message("Password length should be greater than 8 characters")
-              .build();
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(objectMapper.writeValueAsString(errorClass));
-        }
-        // Create a new User
         optionalUser.get().setPassword(encodedPassword);
         userRepository.save(optionalUser.get());
         Map<String, String> map = new HashMap<>();
@@ -83,24 +77,22 @@ public class UserPasswordUpdateService {
       }
     } catch (DataAccessException e) {
       log.debug("Error while updating user: {}", e.getMessage());
-      ErrorClass errorClass = ErrorClass.builder()
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      Error error = Error.builder()
           .cause(DATABASE_ERROR)
           .message(e.getMessage())
           .build();
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(objectMapper.writeValueAsString(errorClass));
+          .body(objectMapper.writeValueAsString(error));
 
     } catch (Exception e) {
       log.debug("Error while updating user: {}", e.getMessage());
-      ErrorClass errorClass = ErrorClass.builder()
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      Error error = Error.builder()
           .cause("Server error")
           .message(e.getMessage())
           .build();
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(objectMapper.writeValueAsString(errorClass));
-
+          .body(objectMapper.writeValueAsString(error));
     }
   }
+
 }
