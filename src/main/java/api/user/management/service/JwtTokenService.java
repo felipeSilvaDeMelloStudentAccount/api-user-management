@@ -31,7 +31,7 @@ public class JwtTokenService {
         expirationDate);
     try {
       JWTClaimsSet claims = new JWTClaimsSet.Builder()
-          .subject(user.getId().toString())
+          .subject(user.getId())
           .issueTime(now)
           .expirationTime(expirationDate)
           .claim("username", user.getUserName())
@@ -47,7 +47,7 @@ public class JwtTokenService {
     } catch (Exception e) {
       log.error(
           "Error while generating JWT token for userId {} with expiry set to {} error message : {}",
-          user.getId().toString(), expirationDate, e.getMessage());
+          user.getId(), expirationDate, e.getMessage());
       return null;
     }
 
