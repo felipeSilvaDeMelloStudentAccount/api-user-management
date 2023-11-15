@@ -1,16 +1,13 @@
-# api-user-management
+# User Management API
 
-User Management
+## Endpoints
 
-# API Endpoints
+### User Registration API
 
-## User Registration API
+This is the documentation for the User Registration API, allowing users to register with their email
+and other information.
 
-This is the documentation for the User Registration API, which allows users to register with their
-email and other
-information.
-
-### Register User
+#### Register User
 
 Register a user by providing the necessary details.
 
@@ -18,19 +15,21 @@ Register a user by providing the necessary details.
 - **Method**: `POST`
 - **Content Type**: `application/json`
 
-#### Request Body
+##### Request Body
 
 - **email**: The user's email address.
 - **userName**: The user's username.
 - **password**: The user's password.
 - **confirmPassword**: The user's password confirmation.
 
-- #### Password Policy
+###### Password Policy
+
 - At least 8 chars
 - Contains at least one digit
 - Contains at least one lower alpha char and one upper alpha char
 - Contains at least one char within a set of special chars (@#%$^ etc.)
-- #### Example Request Body
+
+##### Example Request Body
 
 ```json
 {
@@ -41,9 +40,9 @@ Register a user by providing the necessary details.
 }
 ```
 
-#### Example Responses 400, 500, 201
+##### Example Responses 400, 500, 201
 
-##### HTTP 400
+###### HTTP 400
 
 ```json
 {
@@ -51,7 +50,7 @@ Register a user by providing the necessary details.
 }
 ```
 
-##### HTTP 500
+###### HTTP 500
 
 ```json
 {
@@ -59,7 +58,7 @@ Register a user by providing the necessary details.
 }
 ```
 
-##### HTTP 201
+###### HTTP 201
 
 ```json
 {
@@ -69,7 +68,7 @@ Register a user by providing the necessary details.
 
 ---
 
-### Login User
+#### Login User
 
 Login a user by providing the necessary details.
 
@@ -77,11 +76,12 @@ Login a user by providing the necessary details.
 - **Method**: `POST`
 - **Content Type**: `application/json`
 
-#### Request Body
+##### Request Body
 
 - **email**: The user's email address.
 - **password**: The user's password.
-- #### Example Request Body
+
+##### Example Request Body
 
 ```json
 {
@@ -90,10 +90,9 @@ Login a user by providing the necessary details.
 }
 ```
 
+##### Example Responses 401, 404, 200
 
-#### Example Responses 401, 404, 200
-
-##### HTTP 401
+###### HTTP 401
 
 ```json
 {
@@ -101,7 +100,7 @@ Login a user by providing the necessary details.
 }
 ```
 
-##### HTTP 404
+###### HTTP 404
 
 ```json
 {
@@ -109,7 +108,7 @@ Login a user by providing the necessary details.
 }
 ```
 
-##### HTTP 200
+###### HTTP 200
 
 ```json
 {
@@ -119,22 +118,24 @@ Login a user by providing the necessary details.
 
 ---
 
-### Update User Password
+#### Update User Password
 
 Update a user password by providing the necessary details.
+
 - **URL**: `http://localhost:9001/api/v1/users/{userid}`
 - **Method**: `PATCH`
 - **Content Type**: `application/json`
 
-#### Request Header
+##### Request Header
 
-- **Authorization** : Bearer Token from login
+- **Authorization**: Bearer Token from login
 
-#### Request Body
+##### Request Body
 
 - **currentPassword**: The user's current password.
 - **newPassword**: The user's new password.
-- #### Example Request Body
+
+##### Example Request Body
 
 ```json
 {
@@ -145,18 +146,21 @@ Update a user password by providing the necessary details.
 
 ---
 
-### Get user by ID
+#### Get User by ID
+
 Get a user by ID.
+
 - **URL**: `http://localhost:9001/api/v1/users/{userid}`
 - **Method**: `GET`
 - **Content Type**: `application/json`
 
-#### Request Header
+##### Request Header
 
-- **Authorization** : Bearer Token from login
+- **Authorization**: Bearer Token from login
+
 ---
 
-### Delete user by ID
+#### Delete User by ID
 
 Delete a user by ID.
 
@@ -164,15 +168,49 @@ Delete a user by ID.
 - **Method**: `DELETE`
 - **Content Type**: `application/json`
 
-#### Request Header
+##### Request Header
 
-Authorization : Bearer JWT...
+- **Authorization**: Bearer JWT...
 
-## Running the application
+## Software Requirements to Run the Application
+
+### Java Development Kit (JDK) 21 or Greater
+
+- Visit the Oracle JDK or OpenJDK website to download and install the JDK.
+  https://www.oracle.com/java/technologies/downloads/
+- Set the JAVA_HOME environment variable to the JDK installation directory.
+- Add the JDK bin directory to the PATH environment variable.
+- Verify the JDK installation by running the following command in a terminal window:
+
+  ```bash
+  java -version
+  ```
+
+### Maven 3.6.3 or Greater
+
+- Visit the Maven website to download and install Maven: https://maven.apache.org/
+- Set the MAVEN_HOME environment variable to the Maven installation directory.
+- Add the Maven bin directory to the PATH environment variable.
+- Verify the Maven installation by running the following command in a terminal window:
+
+  ```bash
+  mvn -version
+  ```
+
+## Running the Application
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.arguments=--DBURI=mongodb+srv://<username>:<password>@camp.s1dnkux.mongodb.net/dev,--SECRET=<SECRETKEY>,--EXPIRATION=<TOKEN_EXPIRY> -f pom.xml
 ```
 
----
+## Disclaimer
+
+This software is intended for use solely within the scope of my college project.
+It is not to be sold, distributed, or utilized for any commercial purposes.
+All rights to this software are reserved, and any unauthorized use or reproduction is strictly
+prohibited.
+By using this software, you acknowledge and agree to adhere to these terms.
+**Note:** Please consult with legal professionals to ensure that the disclaimer aligns with the
+legal requirements in your jurisdiction.
+
 **README.md created by Felipe Silva de Mello**
