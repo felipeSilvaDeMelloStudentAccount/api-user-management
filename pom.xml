@@ -11,6 +11,13 @@
       </plugin>
     </plugins>
   </build>
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub felipeSilvaDeMelloStudentAccount Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/felipeSilvaDeMelloStudentAccount/api-user-management</url>
+		</repository>
+	</distributionManagement>
   <dependencies>
     <dependency>
       <artifactId>spring-boot-starter-data-mongodb</artifactId>
